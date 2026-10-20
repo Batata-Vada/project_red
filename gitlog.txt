@@ -1,0 +1,191 @@
+commit 738d88bad6f0bfae4b2ad53273ff606ad6e76a98
+Author: HawkWeldon <hawksweldon@gmail.com>
+Date:   Sun Oct 18 00:12:06 2026 +0530
+
+    v5 let's go!!!!!
+
+commit 8abde689637814f4edfad6c59af399e3751bf8fa
+Author: HawkWeldon <hawksweldon@gmail.com>
+Date:   Sat Oct 17 23:44:20 2026 +0530
+
+    v5
+
+commit a3a4409d62d53b0748cb1315e17865a04da890fe
+Author: HawkWeldon <hawksweldon@gmail.com>
+Date:   Sat Oct 17 21:32:38 2026 +0530
+
+    Trees
+
+commit 1727278d91dc652248f573afd9f3b55161f3c174
+Author: HawkWeldon <hawksweldon@gmail.com>
+Date:   Sat Oct 17 21:18:15 2026 +0530
+
+    V4 staged
+
+commit fc05a71f3ba17f312b5d7c7a03b7fd0501ef9195
+Author: HawkWeldon <hawksweldon@gmail.com>
+Date:   Sat Oct 17 20:31:02 2026 +0530
+
+    I got saved by git
+
+commit e4f09dc5bf1b11a4bbef521048b25ea049a88c24
+Author: HawkWeldon <hawksweldon@gmail.com>
+Date:   Sat Oct 17 18:21:43 2026 +0530
+
+    naiming fix 2
+
+commit 14b207a30231debceab1a07731ab25865b85fd4f
+Author: HawkWeldon <hawksweldon@gmail.com>
+Date:   Sat Oct 17 18:12:22 2026 +0530
+
+    naming fix
+
+commit 8cfce740d9f280a51762e3fd6d60d3095f6e5a0f
+Author: HawkWeldon <hawksweldon@gmail.com>
+Date:   Sat Oct 17 18:07:12 2026 +0530
+
+    Fixing a little problem
+
+commit 2592fa280b95f9cb0d5348e9cdc143a80fdcf31c
+Author: HawkWeldon <hawksweldon@gmail.com>
+Date:   Sat Oct 17 18:02:07 2026 +0530
+
+    V2_2 commit
+
+commit cd7cca32b8e041aaed95f2d37f831e4fa6f38cba
+Author: HawkWeldon <hawksweldon@gmail.com>
+Date:   Sat Oct 17 17:55:13 2026 +0530
+
+    v2_2 staged
+
+commit ca59bef8d9d60144f9e9ead1f56558553b942222
+Author: HawkWeldon <hawksweldon@gmail.com>
+Date:   Sat Oct 17 17:44:13 2026 +0530
+
+    minor change
+
+commit 2e50c7088aa34fe20f9d285e068d5c8550e3f769
+Author: HawkWeldon <hawksweldon@gmail.com>
+Date:   Sat Oct 17 17:39:54 2026 +0530
+
+    V2_1
+
+commit 7e65c85d64bd25bce4205eafbd43519053fb10b3
+Author: HawkWeldon <hawksweldon@gmail.com>
+Date:   Sat Oct 17 17:13:09 2026 +0530
+
+    clean up
+
+commit ac740b1c8911f97a8a29a7fa2fe565505475c26e
+Author: HawkWeldon <hawksweldon@gmail.com>
+Date:   Thu Oct 15 20:05:54 2026 +0530
+
+    V2
+
+commit 883c187f4d6cf27f747aac78d84baf8d4172e193
+Author: HawkWeldon <hawksweldon@gmail.com>
+Date:   Thu Oct 15 19:14:26 2026 +0530
+
+    Onnx_export
+
+commit 2f62fc9155e5468410553bcd54eb25c8207e075b
+Author: HawkWeldon <hawksweldon@gmail.com>
+Date:   Thu Oct 15 19:10:48 2026 +0530
+
+    Gama exported with onnxscript installing
+
+commit 1b5cb8fac1a048910215892b1661c0891d5385a5
+Author: HawkWeldon <hawksweldon@gmail.com>
+Date:   Thu Oct 15 19:03:29 2026 +0530
+
+    training complete
+
+commit b5d0df7125cf6914fcd9525929178ec68f702b1d
+Author: HawkWeldon <hawksweldon@gmail.com>
+Date:   Thu Oct 15 18:25:48 2026 +0530
+
+    stage set
+
+commit 1d98a7704510b431e4201133c3350f882b766a6d
+Author: HawkWeldon <hawksweldon@gmail.com>
+Date:   Thu Oct 15 18:04:27 2026 +0530
+
+    scaler_y
+
+commit 58c9d209e56da77fd0e98a463f290fae50b81c50
+Author: HawkWeldon <hawksweldon@gmail.com>
+Date:   Thu Oct 15 18:02:59 2026 +0530
+
+    scaler_x
+
+commit b8a9b8093b36394bead78a66ab20b5133e2dcd30
+Author: HawkWeldon <hawksweldon@gmail.com>
+Date:   Thu Oct 15 17:56:12 2026 +0530
+
+    Data scaled
+
+commit d877ff82e06a6ecbfa320c3997f3f7a4998c4d1d
+Author: HawkWeldon <hawksweldon@gmail.com>
+Date:   Thu Oct 15 17:16:11 2026 +0530
+
+    model skeleton
+
+commit de606d9c8bf1e84b735eb6a772e025568855f587
+Author: HawkWeldon <hawksweldon@gmail.com>
+Date:   Thu Oct 15 16:15:31 2026 +0530
+
+    mix of real and syth data
+
+commit 854bbe574c64112f1ce1b9448355084e71968399
+Author: HawkWeldon <hawksweldon@gmail.com>
+Date:   Thu Oct 15 16:07:16 2026 +0530
+
+    Synth_data_achieved
+
+commit 60ca2b3c875cca542351844b244474193e424736
+Author: HawkWeldon <hawksweldon@gmail.com>
+Date:   Thu Oct 15 15:42:55 2026 +0530
+
+    data generated
+
+commit 8cc7e611662a0acd40b2a254a700bbb54c05a79f
+Author: HawkWeldon <hawksweldon@gmail.com>
+Date:   Tue Oct 6 21:43:14 2026 +0530
+
+    V00
+
+commit c75b559d81d23d09010383223bfedefe555b956a
+Author: HawkWeldon <hawksweldon@gmail.com>
+Date:   Tue Oct 6 20:50:19 2026 +0530
+
+    Some analysis
+
+commit c9c49cee124e3efde8eb9e8a6153821a80ef4c90
+Author: HawkWeldon <hawksweldon@gmail.com>
+Date:   Tue Oct 6 13:16:53 2026 +0530
+
+    problem index processed
+
+commit 29a82012243f5bc34b9d98d1dc3034707cb7be51
+Author: HawkWeldon <hawksweldon@gmail.com>
+Date:   Tue Oct 6 12:04:40 2026 +0530
+
+    droping slugs and  analysis
+
+commit 6826bc14cb94d5ad2ba0a06bbf0bb72d7ecfb641
+Author: HawkWeldon <hawksweldon@gmail.com>
+Date:   Tue Oct 6 00:35:48 2026 +0530
+
+    OHE to  platforms
+
+commit 010cb437d3a3f57e0f47611e3c25cccbe95ac4b0
+Author: HawkWeldon <hawksweldon@gmail.com>
+Date:   Tue Oct 6 00:10:20 2026 +0530
+
+    dropping ids and url
+
+commit 67c4c5db651bde9e2308f8db9e93b7f9aa4e15ed
+Author: HawkWeldon <hawksweldon@gmail.com>
+Date:   Mon Oct 5 23:37:21 2026 +0530
+
+    first step
