@@ -115,9 +115,11 @@ class PipelineTests(unittest.TestCase):
                 "SAY_PROJECT_RED_EXPORT_TOKEN": "test-token",
             }), patch.object(fetch, "OUTPUT", path), patch.object(fetch.requests, "Session") as session_ctor:
                 session_ctor.return_value.__enter__.return_value = mock_session
-                self.assertEqual(fetch.fetch_events(), 0)
-                self.assertEqual(path.read_text(), "")
-                path.write_text("old-data\n")
+                # An unexpectedly empty export must not erase previously collected events.
+                with self.assertRaisesRegex(RuntimeError, "0 events"):
+                    fetch.fetch_events()
+                self.assertEqual(path.read_text(), "old-data\\n")
+                path.write_text("old-data\\n")
                 response.raise_for_status.side_effect = RuntimeError("Simulated API error")
                 with self.assertRaises(RuntimeError):
                     fetch.fetch_events()
