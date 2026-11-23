@@ -180,6 +180,9 @@ def fetch_events():
                     raise ValueError("Invalid pagination cursor")
                 after_id = cursor
 
+        if(total == 0 and OUTPUT.exists() and OUTPUT.stat().st_size > 0):
+            raise RuntimeError("Backend retunred 0 events")
+
         os.replace(temp_path, OUTPUT)
     finally:
         temp_path.unlink(missing_ok=True)
