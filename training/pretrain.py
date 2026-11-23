@@ -23,7 +23,7 @@ except ImportError:
 ROOT = Path(__file__).resolve().parents[1]
 OUTPUT = ROOT / "artifacts" / "bootstrap_v1"
 SEED = 42
-SAMPLES = 20_000
+SAMPLES = 2000
 
 
 def generate_synthetic_data(samples=SAMPLES, seed=SEED):
