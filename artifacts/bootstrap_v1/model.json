@@ -1,4 +1,7 @@
 {
+  "artifact_schema_version": 1,
+  "model_type": "logistic-regression",
+  "feature_contract": "say-practice-v1",
   "model_version": "project-red-bootstrap-v1",
   "source": "synthetic_pretraining",
   "features": [
@@ -33,5 +36,15 @@
     0.20755128782318488,
     -0.051793096968582635
   ],
-  "intercept": -0.1510170100933698
+  "intercept": -0.1510170100933698,
+  "target_probability": 0.6,
+  "acceptable_probability_range": [
+    0.45,
+    0.75
+  ],
+  "rating_grid": [
+    800,
+    3500,
+    100
+  ]
 }
