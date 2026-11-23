@@ -118,8 +118,8 @@ class PipelineTests(unittest.TestCase):
                 # An unexpectedly empty export must not erase previously collected events.
                 with self.assertRaisesRegex(RuntimeError, "0 events"):
                     fetch.fetch_events()
-                self.assertEqual(path.read_text(), "old-data\\n")
-                path.write_text("old-data\\n")
+                self.assertEqual(path.read_text(), "old-data\n")
+                path.write_text("old-data\n")
                 response.raise_for_status.side_effect = RuntimeError("Simulated API error")
                 with self.assertRaises(RuntimeError):
                     fetch.fetch_events()
