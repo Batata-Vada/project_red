@@ -73,3 +73,43 @@ Raw user events and training CSV files are ignored from Git going forward.
 They contain pseudonymous but potentially identifiable behavioral histories.
 Previously committed data may still exist in Git history: audit access and
 rotate leaked secrets if any; adding `.gitignore` does not remove history.
+
+## Updating safely without losing local files
+
+**Fetching is the safe first step:**
+
+```bash
+git fetch --tags origin main
+git status --short
+git diff --name-status HEAD FETCH_HEAD
+```
+
+These commands do not change working files. `git fetch` is not a pull; it
+does not delete local `.env` files, SQLite databases, training CSVs, virtual
+environments, or model artifacts.
+
+New clones can use the guarded updater from the repository root:
+
+```bash
+bash scripts/safe_update.sh          # Fetch only; leave working files untouched
+bash scripts/safe_update.sh --apply  # Attempt a checked fast-forward
+```
+
+The `--apply` option refuses the update when tracked files have uncommitted
+changes, incoming commits would delete existing tracked files, incoming
+files collide with existing ignored or untracked paths, or the branch
+cannot fast-forward. If checks pass, version-controlled application files
+**are updated** to the newer commit while personal ignored files are
+preserved. This guard applies only when this script is used: Git cannot
+prevent someone from running a regular `git pull` directly.
+
+**Existing clones without this script** should use `git fetch` and inspect
+the incoming file changes before their first pull. Earlier cleanup commits
+stopped tracking databases, exported CSVs, and generated model artifacts.
+An ordinary pull may delete previously tracked local copies. Back up those
+files **outside the repository** before applying any deletion and restore
+them afterward if needed. Do not run `git reset --hard` or `git clean -fdx`
+as a shortcut.
+
+`.gitignore` only controls new untracked files; it never protects files
+recorded in older commits. Keep user data and credentials out of Git.
