@@ -5,3 +5,8 @@ __pycache__/
 .pytest_cache/
 data/.auto-update.lock
 *.log
+
+# Private training events and derived user-level data
+/data/
+# Machine-specific model files and generated artifacts
+/artifacts/real_v1/

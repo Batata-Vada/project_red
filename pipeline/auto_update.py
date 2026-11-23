@@ -8,7 +8,7 @@ from contextlib import contextmanager
 from pathlib import Path
 
 from pipeline import build_training_dataset, fetch_say_events
-from training import model_contract, online_update
+from training import train_real
 
 logger = logging.getLogger(__name__)
 ROOT = Path(__file__).resolve().parents[1]
@@ -39,28 +39,27 @@ def run_cycle():
             print("Project Red: no eligible training rows; model was not updated.", flush=True)
             return {"events": events, "rows": 0, "newly_learned": 0}
 
-        try:
-            learned = online_update.online_update()
-        except RuntimeError as exc:
-            # Official rejudges can revise or remove earlier training records.
-            # Replay the validated dataset, rather than double-counting changed events.
-            reason = str(exc)
-            if not (reason.startswith("Previously trained event ")
-                    or reason.startswith("Trained events disappeared.")):
-                raise
-            logger.warning("Training evidence was revised; rebuilding from bootstrap")
-            learned = online_update.online_update(rebuild=True)
+        if rows < train_real.MIN_ROWS:
+            print(
+                f"Project Red: {events} events and {rows} eligible outcomes; "
+                f"real-only deployment requires at least {train_real.MIN_ROWS} "
+                "eligible outcomes and independent validation.",
+                flush=True,
+            )
+            return {"events": events, "rows": rows, "newly_learned": 0}
 
-        artifact = model_contract.read_artifact(online_update.INFERENCE_PATH)
-        seen = artifact.get("real_events_seen")
-        if type(seen) is not int or seen != rows:
-            raise RuntimeError("Online artifact and training dataset row count disagree")
+        try:
+            trained = train_real.train_real()
+        except train_real.InsufficientEvidence as exc:
+            logger.info("Real-only model not yet deployable: %s", exc)
+            return {"events": events, "rows": rows, "newly_learned": 0}
+        if trained["validation"]["passed"] is not True:
+            raise RuntimeError("Project Red real-model validation failed")
         print(
-            f"Project Red: {events} exported events; {rows} training rows; "
-            f"{learned} newly learned in this run.",
+            f"Project Red: validated real-only model with {rows} eligible events.",
             flush=True,
         )
-        return {"events": events, "rows": rows, "newly_learned": learned}
+        return {"events": events, "rows": rows, "newly_learned": rows}
 
 
 def main():

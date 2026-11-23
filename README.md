@@ -1,34 +1,75 @@
-# Project Red automatic training
+# Project Red — real-data recommendation training
 
-The SAY integration collects **verified** Codeforces submissions in SAY-backend.
-The Project Red pipeline performs a complete authenticated export, validates
-events, regenerates `data/training_rows.csv`, and incrementally updates
-`artifacts/online_v1/{learner.joblib,model.json}` whenever eligible data exists.
+SAY-backend owns authentication, Codeforces submission verification, timed
+practice, event export and model serving. Project Red owns private ingestion,
+historical dataset construction, training and validation.
 
-The easiest local startup is the SAY-backend sibling launcher:
+## What the five-solve milestone means
+
+The Practice page shows `5 / 5 verified` once the user's recent, distinct,
+officially accepted and rated timed solves meet the **inference history**
+requirement. This does **not** mean that the next ML model is already trained:
+a training sample requires an additional, later practice session with historical
+features available when it started and a verified outcome.
+
+Existing Codeforces submissions imported after the fact cannot be pretended
+to have been observed earlier. An unsuccessful submission needs a final verdict
+and trustworthy synchronization coverage to be used as a negative example.
+
+## Run the real training pipeline
+
+From `SAY-backend`, the all-in-one launcher runs the authenticated Project
+Red worker as a sibling process:
 
 ```bash
-cd ../SAY-backend
 .venv/bin/python scripts/run_local.py
 ```
 
-It reads `SAY-backend/.env` and securely passes the export token to the
-Project Red worker. No export token is sent to the browser or committed.
-
-To run only this pipeline independently, set `SAY_BACKEND_URL` and
-`SAY_PROJECT_RED_EXPORT_TOKEN` and execute:
+Alternatively, in `project_red`, set `SAY_BACKEND_URL` and
+`SAY_PROJECT_RED_EXPORT_TOKEN` privately and run:
 
 ```bash
-.venv/bin/python -m pipeline.auto_update --interval-seconds 180
+.venv/bin/python -m pipeline.auto_update --once
 ```
 
-The optional `--once` flag runs one full export/dataset/training cycle.
-Keep one worker active per machine; a file lock prevents concurrent cycles.
+The exporter uses schema v2 and the stable `say-practice-v1` feature contract.
+The worker makes a complete export, constructs chronological rows and attempts
+**real-only** training once at least 200 eligible outcomes exist. It requires
+at least 10 distinct pseudonymous users, both success/failure classes, a
+chronological later-session holdout and a disjoint unseen-user holdout.
+The evaluation model must outperform the constant-rate Brier baseline and have
+ROC AUC above 0.5 on both holdouts. These are preliminary safety gates, not
+proof that deployment improves learning or is well calibrated.
 
-An empty training CSV is expected until the SAY backend has verified enough
-**historically observed** timed solves. The pipeline keeps all existing
-filtering, pseudonymization, and outcome rules. Changed old outcomes trigger
-a full replay from the bootstrap checkpoint, never double counting.
-Data collection does not automatically declare a model calibrated or ready
-for deployment. `PROJECT_RED_ENABLED` remains an explicit backend setting;
-a live model should be evaluated on held-out real outcomes before enabling.
+Only a passing real-only model is written to
+`artifacts/real_v1/model.json`. It records the number of real observations,
+training user count and held-out evaluation metrics. If any gate fails, the
+previous artifact remains untouched. Deployment should still require human
+review of calibration by difficulty band and actual recommendation outcomes.
+
+The older `bootstrap_v1` and `online_v1` artifacts were trained with synthetic
+initialization. They are **not** suitable to activate as a real-only deployed
+recommender, even if they contain some real updates. The automatic worker no
+longer publishes those checkpoints for live serving.
+
+## Serving in SAY-backend
+
+Set the backend's private `PROJECT_RED_MODEL_PATH` to the absolute path of the
+validated `artifacts/real_v1/model.json`. The local launcher uses the sibling
+path by default when that setting is not explicitly configured.
+Keep `PROJECT_RED_ENABLED=false` until the model is independently validated
+and you deliberately enable it. The backend rejects synthetic-sourced models and
+artifacts without successful real-data evaluation metadata.
+
+The Practice page uses the authenticated
+`GET /api/me/practice-sessions/readiness` endpoint to show historical
+readiness and whether a validated model is available. Only a recommendation
+response with `recommendation_engine: "project_red"` means ML inference was
+actually used. Other responses safely use SAY's regular recommender.
+
+## Privacy
+
+Raw user events and training CSV files are ignored from Git going forward.
+They contain pseudonymous but potentially identifiable behavioral histories.
+Previously committed data may still exist in Git history: audit access and
+rotate leaked secrets if any; adding `.gitignore` does not remove history.
