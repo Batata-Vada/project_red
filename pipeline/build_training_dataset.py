@@ -40,6 +40,7 @@ def load_rows():
     rows = []
     stats = Counter()
     previous_id = 0
+    exclusions = []
 
     with INPUT_FILE.open(encoding="utf-8") as input_file:
         for line_number, line in enumerate(input_file, 1):
@@ -52,20 +53,23 @@ def load_rows():
                 raise ValueError(f"Invalid event at JSONL line {line_number}: {exc}") from exc
             stats["total_events"] += 1
 
+            reason = None
             if event["problem_rating"] is None:
-                stats["unrated_target"] += 1
-                continue
-            if event["previously_solved"]:
-                stats["previously_solved"] += 1
+                reason = "unrated_target"
+            elif event["previously_solved"]:
+                reason = "previously_solved"
+            elif event["outcome_status"] == "UNKNOWN":
+                reason = "unknown_outcome"
+            elif event["history_features"] is None:
+                reason = "insufficient_history"
+            if reason is not None:
+                stats[reason] += 1
+                exclusions.append((
+                    event["event_id"], event["problem_external_id"], reason
+                ))
                 continue
             outcome = event["outcome_status"]
-            if outcome == "UNKNOWN":
-                stats["unknown_outcome"] += 1
-                continue
             history = event["history_features"]
-            if history is None:
-                stats["insufficient_history"] += 1
-                continue
 
             row = {
                 "user_key": event["user_key"],
@@ -78,6 +82,7 @@ def load_rows():
             rows.append(row)
 
     rows.sort(key=lambda row: (datetime.fromisoformat(row["started_at"]), row["event_id"]))
+    stats["exclusion_details"] = exclusions
     return rows, stats
 
 
@@ -112,6 +117,14 @@ def build_dataset():
         print(f"  {key}: {stats[key]}")
     if not rows:
         print("No eligible real training rows yet.")
+        print("Excluded sessions (first failed check per session):")
+        for event_id, external_id, reason in stats["exclusion_details"]:
+            print(f"  session {event_id} ({external_id}): {reason}")
+        print(
+            "Five distinct, officially verified timed solves observed before "
+            "a later target session are required for historical features. "
+            "Those earlier solves do not automatically become training targets."
+        )
     elif not 0 < positive < len(rows):
         print("NOTE: Real data currently contains only one outcome class.")
     print(f"Saved: {OUTPUT_FILE}")
