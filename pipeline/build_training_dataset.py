@@ -107,100 +107,72 @@ def load_events():
     return grouped
 
 
-def historical_features(completed_sessions):
-    # Match the current backend's 150-session history window.
-    recent = completed_sessions[-MAX_HISTORY:]
+# def historical_features(completed_sessions):
+#     # Match the current backend's 150-session history window.
+#     recent = completed_sessions[-MAX_HISTORY:]
 
-    solved = []
-    seen_problems = set()
+#     solved = []
+#     seen_problems = set()
 
-    # Most recently finished sessions first.
-    for event in reversed(recent):
-        problem = event["problem_external_id"]
+#     # Most recently finished sessions first.
+#     for event in reversed(recent):
+#         problem = event["problem_external_id"]
 
-        if problem in seen_problems:
-            continue
+#         if problem in seen_problems:
+#             continue
 
-        if not event["official_solved"]:
-            continue
+#         if not event["official_solved"]:
+#             continue
 
-        seen_problems.add(problem)
+#         seen_problems.add(problem)
 
-        if not valid_rating(event["problem_rating"]):
-            continue
+#         if not valid_rating(event["problem_rating"]):
+#             continue
 
-        solved.append(event)
+#         solved.append(event)
 
-        if len(solved) == MAX_SOLVES:
-            break
+#         if len(solved) == MAX_SOLVES:
+#             break
 
-    if len(solved) < MIN_HISTORY:
-        return None
+#     if len(solved) < MIN_HISTORY:
+#         return None
 
-    durations = [
-        event["duration_seconds"] / 60.0
-        for event in solved
-    ]
+#     durations = [
+#         event["duration_seconds"] / 60.0
+#         for event in solved
+#     ]
 
-    return {
-        "last_problem_rating": solved[0]["problem_rating"],
-        "mean_solve_time_minutes": fmean(durations),
-        "time_std_minutes": pstdev(durations),
-        "timed_solved_count": len(solved),
-        "last_problem_solve_time_minutes": durations[0],
-    }
+#     return {
+#         "last_problem_rating": solved[0]["problem_rating"],
+#         "mean_solve_time_minutes": fmean(durations),
+#         "time_std_minutes": pstdev(durations),
+#         "timed_solved_count": len(solved),
+#         "last_problem_solve_time_minutes": durations[0],
+#     }
 
 
 def build_user_rows(events, stats):
     rows = []
 
-    # Process target sessions in chronological start order.
-    by_start = sorted(
-        events,
-        key=lambda e: (e["_start"], e["event_id"]),
-    )
+    for event in events:
 
-    # Also maintain an independent finish-time order.
-    by_finish = sorted(
-        events,
-        key=lambda e: (e["_finish"], e["event_id"]),
-    )
-
-    completed = []
-    finish_cursor = 0
-
-    for event in by_start:
-
-        # A session can enter history only when it was
-        # finished BEFORE the target session began.
-        while (
-            finish_cursor < len(by_finish)
-            and by_finish[finish_cursor]["_finish"]
-            < event["_start"]
-        ):
-            completed.append(by_finish[finish_cursor])
-            finish_cursor += 1
-
-        features = historical_features(completed)
-
-        # Never train on unrated target problems.
         if not valid_rating(event["problem_rating"]):
             stats["unrated_target"] += 1
             continue
 
-        # Exclude problems already solved before this session.
         if event["previously_solved"]:
             stats["previously_solved"] += 1
             continue
 
-        # No observed Codeforces submission means
-        # we cannot assign a trustworthy negative label.
-        if not event["official_attempt_observed"]:
-            stats["no_observed_attempt"] += 1
+        outcome = event["outcome_status"]
+
+        if outcome not in ("SOLVED", "FAILED"):
+            stats["unknown_outcome"] += 1
             continue
 
-        # Require enough historical practice evidence.
-        if features is None:
+        history = event["history_features"]
+
+        if history is None:
             stats["insufficient_history"] += 1
             continue
 
@@ -209,15 +181,20 @@ def build_user_rows(events, stats):
             "event_id": event["event_id"],
             "started_at": event["started_at"],
             "candidate_rating": event["problem_rating"],
-            **features,
-            "label": int(event["official_solved"]),
+            "last_problem_rating": history["last_problem_rating"],
+            "mean_solve_time_minutes":
+                history["mean_solve_time_minutes"],
+            "time_std_minutes": history["time_std_minutes"],
+            "timed_solved_count": history["timed_solved_count"],
+            "last_problem_solve_time_minutes":
+                history["last_problem_solve_time_minutes"],
+            "label": 1 if outcome == "SOLVED" else 0,
         }
 
         rows.append(row)
         stats["included"] += 1
 
     return rows
-
 
 def build_dataset():
     grouped = load_events()
@@ -259,7 +236,7 @@ def build_dataset():
     for reason in (
         "unrated_target",
         "previously_solved",
-        "no_observed_attempt",
+        "unknown_outcome",
         "insufficient_history",
     ):
         print(f"  {reason}: {stats[reason]}")

@@ -155,13 +155,22 @@ def pretrain():
 
     # Framework-independent inference artifact.
     artifact = {
-        "model_version": "project-red-bootstrap-v1",
-        "source": "synthetic_pretraining",
-        "features": FEATURES,
-        "x_mean": scaler.mean_.tolist(),
-        "x_scale": scaler.scale_.tolist(),
-        "coef": model.coef_[0].tolist(),
-        "intercept": float(model.intercept_[0]),
+    "artifact_schema_version": 1,
+    "model_type": "logistic-regression",
+    "feature_contract": "say-practice-v1",
+
+    "model_version": "project-red-bootstrap-v1",
+    "source": "synthetic_pretraining",
+
+    "features": FEATURES,
+    "x_mean": scaler.mean_.tolist(),
+    "x_scale": scaler.scale_.tolist(),
+    "coef": model.coef_[0].tolist(),
+    "intercept": float(model.intercept_[0]),
+
+    "target_probability": 0.60,
+    "acceptable_probability_range": [0.45, 0.75],
+    "rating_grid": [800, 3500, 100],
     }
 
     with (OUTPUT / "model.json").open("w") as file:

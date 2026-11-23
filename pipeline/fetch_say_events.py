@@ -114,9 +114,12 @@ def fetch_events():
                     if not isinstance(payload, dict):
                         raise ValueError("Invalid API response")
 
-                    if payload.get("schema_version") != 1:
-                        raise ValueError("Unsupported schema version")
+                    if payload.get("schema_version") != 2:
+                     raise ValueError("Unsupported schema version")
 
+                    if payload.get("feature_contract") != "say-practice-v1":
+                        raise ValueError("Feature contract mismatch")
+                    
                     events = payload.get("events")
 
                     if not isinstance(events, list):
